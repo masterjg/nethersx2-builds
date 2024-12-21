@@ -63,7 +63,11 @@ jobs:
         working-directory: NetherSX2-patch
         run: |
           ./patch-apk.sh
-          ls -al
+          mv *-patched.apk ../nethersx2-${{ needs.check-release.outputs.latest-release }}.apk
+
+      - name: test
+        run: |
+          ls -la
 
   # update-release-file:
   #   runs-on: ubuntu-24.04

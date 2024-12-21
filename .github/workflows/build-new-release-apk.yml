@@ -7,6 +7,7 @@ on:
 
 jobs:
   check-release:
+    name: Check release
     runs-on: ubuntu-24.04
     steps:
       - name: Check out this repository

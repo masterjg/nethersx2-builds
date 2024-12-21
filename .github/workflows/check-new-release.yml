@@ -15,48 +15,34 @@ jobs:
     steps:
       # - name: Check out this repository
       #   uses: actions/checkout@v4
-      #   with:
-      #     persist-credentials: true
-      - name: test
+
+      - name: Get latest release from NetherSX2-patch repository
+        id: get_latest
         run: |
-            echo $GITHUB_TOKEN
+          LATEST_JSON="$(curl -s https://api.github.com/repos/Trixarian/NetherSX2-patch/releases/latest)"
+          LATEST_TAG="$(echo "$LATEST_JSON" | jq -r .tag_name)"
+          echo "LATEST_TAG=$LATEST_TAG" >> "$GITHUB_ENV"
 
-      # - name: Get latest release from NetherSX2-patch
-      #   id: get_latest
-      #   run: |
-      #     # Fetch JSON of the latest release
-      #     LATEST_JSON=$(curl -s https://api.github.com/repos/Trixarian/NetherSX2-patch/releases/latest)
-          
-      #     # Extract the latest release tag
-      #     LATEST_TAG=$(echo "$LATEST_JSON" | jq -r .tag_name)
-
-      #     # Save it to an environment variable for the next step
-      #     echo "LATEST_TAG=$LATEST_TAG" >> "$GITHUB_ENV"
-
-      # - name: Compare with last known release
-      #   id: compare_releases
-      #   run: |
-      #     # Default to 'none' if no .release_version file yet
-      #     LAST_TAG="none"
-      #     if [ -f .release_version ]; then
-      #       LAST_TAG=$(cat .release_version)
-      #     fi
-
-      #     echo "Last known release tag: $LAST_TAG"
-      #     echo "Latest release tag: $LATEST_TAG"
-
-      #     # Compare
-      #     if [ "$LAST_TAG" = "$LATEST_TAG" ]; then
-      #       echo "No new release. Exiting..."
-      #       exit 0
-      #     else
-      #       echo "New release found: $LATEST_TAG"
-      #     fi
+      - name: Compare with last known release
+        id: compare_releases
+        run: |
+          LAST_TAG="none"
+          if [ -f .release_version ]; then
+            LAST_TAG="$(cat .release_version)"
+          fi
+          echo "Last known release tag: $LAST_TAG"
+          echo "Latest release tag: $LATEST_TAG"
+          if [ "$LAST_TAG" = "$LATEST_TAG" ]; then
+            echo "No new release. Exiting..."
+            exit 0
+          else
+            echo "New release found: $LATEST_TAG"
+          fi
       
-      # - name: Process new release (placeholder)
-      #   # Only runs if the previous step didn't exit (i.e. there's a new release)
-      #   run: |
-      #     echo "Do your processing steps here, e.g. build or download artifacts..."
+      - name: Build new NetherSX2 build
+        id: build_nethersx2
+        run: |
+          ls -al
 
       # - name: Update stored release version
       #   run: |

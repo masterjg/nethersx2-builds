@@ -101,7 +101,7 @@ jobs:
         run: |
           ORIGINAL_CHANGELOG="${{ needs.check-release.outputs.latest-release-description }}"
           TRIMMED_CHANGELOG="$(echo "${ORIGINAL_CHANGELOG}" | sed '/^### This release contains the following files:/,$d')"
-          echo -e "#From <${{ needs.check-release.outputs.latest-release-url }}>:\n${TRIMMED_CHANGELOG}" >> CHANGELOG.txt
+          echo -e "# From <${{ needs.check-release.outputs.latest-release-url }}>:\n\n${TRIMMED_CHANGELOG}" >> CHANGELOG.txt
 
       - name: Create release
         uses: softprops/action-gh-release@v2

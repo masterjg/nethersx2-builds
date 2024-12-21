@@ -10,7 +10,8 @@ jobs:
     name: Check release
     runs-on: ubuntu-24.04
     outputs:
-      is_new_release: ${{ steps.compare-releases.outputs.is_new }}
+      latest-release: ${{ steps.get-latest-release.outputs.release }}
+      is-new-release: ${{ steps.compare-releases.outputs.is-new }}
     steps:
       - name: Check out this repository
         uses: actions/checkout@v4
@@ -35,33 +36,19 @@ jobs:
         id: compare-releases
         run: |
           if [ "${{ steps.get-last-known-release.outputs.release }}" = "${{ steps.get-latest-release.outputs.release }}" ]; then
-            echo "is_new=0" >> "$GITHUB_OUTPUT"
+            echo "is-new=0" >> "$GITHUB_OUTPUT"
           else
-            echo "is_new=1" >> "$GITHUB_OUTPUT"
+            echo "is-new=1" >> "$GITHUB_OUTPUT"
           fi
 
-      # - name: Compare with last known release
-      #   run: |
-      #     LAST_TAG=""
-      #     if [ -f .release_version ]; then
-      #       LAST_TAG="$(cat .release_version)"
-      #     fi
-      #     echo "Last known release tag: $LAST_TAG"
-      #     echo "Latest release tag: $LATEST_TAG"
-      #     if [ "$LAST_TAG" = "$LATEST_TAG" ]; then
-      #       echo "is_new=0" >> "$GITHUB_OUTPUT"
-      #     else
-      #       echo "is_new=1" >> "$GITHUB_OUTPUT"
-      #     fi
-
-  # build-release:
-  #   needs: check-release
-  #   if: needs.check-release.outputs.is_new == '1'
-  #   runs-on: ubuntu-24.04
-  #   steps:
-  #     - name: build
-  #       run: |
-  #         ls -la
+  build-release:
+    needs: check-release
+    if: needs.check-release.outputs.is-new-release == '1'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: build
+        run: |
+          echo ${{ needs.check-release.outputs.latest-release }}
 
   # update-release-file:
   #   runs-on: ubuntu-24.04

@@ -55,8 +55,8 @@ jobs:
           path: NetherSX2-patch
 
       - name: build
+        working-directory: NetherSX2-patch
         run: |
-          ls -la
           ls -la NetherSX2-patch
 
   # update-release-file:

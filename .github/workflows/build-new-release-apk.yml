@@ -96,18 +96,22 @@ jobs:
         with:
           name: ${{ needs.build-apk.outputs.apk-name }}
 
-      - run: |
-          DESCRIPTION="$(echo "${{ needs.check-release.outputs.latest-release-description }}" | sed '/^### This release contains the following files:/,$d')"
-          echo "${DESCRIPTION}"
-      # - name: Create release
-      #   uses: softprops/action-gh-release@v2
-      #   with:
+      - name: Create release changelog
+        id: create-release-changelog
+        run: |
+          ORIGINAL_CHANGELOG="${{ needs.check-release.outputs.latest-release-description }}"
+          TRIMMED_CHANGELOG="$(echo "${ORIGINAL_CHANGELOG}" | sed '/^### This release contains the following files:/,$d')"
+          echo "changelog=\"${TRIMMED_CHANGELOG}\"" >> "$GITHUB_OUTPUT"
 
-      #     # body_path: ${{ github.workspace }}-CHANGELOG.txt
-      #     # repository: my_gh_org/my_gh_repo
-      #     # note you'll typically need to create a personal access token
-      #     # with permissions to create releases in the other repo
-      #     # token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: ${{ steps.create-release-changelog.outputs.changelog }}
+          preserve_order: true
+          files: ${{ needs.build-apk.outputs.apk-name }}
+          tag_name: ${{ needs.check-release.outputs.latest-release }}
+          fail_on_unmatched_files: true
+          make_latest: true
 
   # update-release-file:
   #   runs-on: ubuntu-24.04

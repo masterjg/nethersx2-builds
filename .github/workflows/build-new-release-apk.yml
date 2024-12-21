@@ -23,6 +23,7 @@ jobs:
         uses: pozetroninc/github-action-get-latest-release@v0.8.0
         with:
           repository: ${{ github.repository }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get latest release from NetherSX2-patch repository
         id: get-latest-release

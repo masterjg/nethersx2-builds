@@ -3,6 +3,7 @@ name: Check for new NetherSX2-patch release
 on:
   schedule:
     - cron: "0 3 * * *"
+  workflow_dispatch
 
 jobs:
   check-release:

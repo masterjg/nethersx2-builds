@@ -54,6 +54,11 @@ jobs:
           ref: ${{ needs.check-release.outputs.latest-release }}
           path: NetherSX2-patch
 
+      - name: Install missing dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y xdelta3
+
       - name: build
         working-directory: NetherSX2-patch
         run: |

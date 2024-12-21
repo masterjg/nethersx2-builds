@@ -26,6 +26,12 @@ jobs:
           echo "release=${LAST_KNOWN_RELEASE}" >> "$GITHUB_OUTPUT"
 
       - name: Get latest release from NetherSX2-patch repository
+        uses: pozetroninc/github-action-get-latest-release@v0.8.0
+        with:
+          owner: Trixarian
+          repo: NetherSX2-patch
+
+      - name: Get latest release from NetherSX2-patch repository
         id: get-latest-release
         run: |
           LATEST_RELEASE_JSON="$(curl -s https://api.github.com/repos/Trixarian/NetherSX2-patch/releases/latest)"
@@ -94,8 +100,15 @@ jobs:
         with:
           name: ${{ needs.build-apk.outputs.apk-name }}
 
-      - run: |
-          ls -la
+      # - name: Create release
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+
+      #     # body_path: ${{ github.workspace }}-CHANGELOG.txt
+      #     # repository: my_gh_org/my_gh_repo
+      #     # note you'll typically need to create a personal access token
+      #     # with permissions to create releases in the other repo
+      #     # token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
 
   # update-release-file:
   #   runs-on: ubuntu-24.04

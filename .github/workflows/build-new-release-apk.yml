@@ -97,7 +97,8 @@ jobs:
           name: ${{ needs.build-apk.outputs.apk-name }}
 
       - run: |
-          echo "${{ needs.check-release.outputs.latest-release-description }}"
+          DESCRIPTION="$(echo "${{ needs.check-release.outputs.latest-release-description }}" | sed '/^### This release contains the following files:/,$d')"
+          echo "${DESCRIPTION}"
       # - name: Create release
       #   uses: softprops/action-gh-release@v2
       #   with:

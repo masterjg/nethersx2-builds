@@ -59,10 +59,11 @@ jobs:
           sudo apt update
           sudo apt install -y xdelta3
 
-      - name: build
+      - name: Patch AetherSX2 APK
         working-directory: NetherSX2-patch
         run: |
           ./patch-apk.sh
+          ls -al
 
   # update-release-file:
   #   runs-on: ubuntu-24.04

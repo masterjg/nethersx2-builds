@@ -13,8 +13,8 @@ jobs:
       contents: write
 
     steps:
-      # - name: Check out this repository
-      #   uses: actions/checkout@v4
+      - name: Check out this repository
+        uses: actions/checkout@v4
 
       - name: Get latest release from NetherSX2-patch repository
         id: get_latest

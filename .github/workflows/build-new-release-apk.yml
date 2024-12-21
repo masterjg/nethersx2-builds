@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  check-release:
-    name: Check release
+  check-latest-release:
+    name: Check latest release
     runs-on: ubuntu-24.04
     outputs:
       latest-release: ${{ steps.get-latest-release.outputs.release }}
@@ -41,8 +41,8 @@ jobs:
   build-apk:
     name: Build APK
     needs:
-      - check-release
-    if: needs.check-release.outputs.is-new-release == '1'
+      - check-latest-release
+    if: needs.check-latest-release.outputs.is-new-release == '1'
     runs-on: ubuntu-24.04
     outputs:
       apk-name: ${{ steps.patch-aethersx2-apk.outputs.result-apk-name }}
@@ -51,7 +51,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Trixarian/NetherSX2-patch
-          ref: ${{ needs.check-release.outputs.latest-release }}
+          ref: ${{ needs.check-latest-release.outputs.latest-release }}
           path: NetherSX2-patch
 
       - name: Install missing dependencies
@@ -67,7 +67,7 @@ jobs:
           mv *-patched.apk ../${APK_NAME}
           echo "result-apk-name=${APK_NAME}" >> "$GITHUB_OUTPUT"
         env:
-          APK_NAME: nethersx2-patch-${{ needs.check-release.outputs.latest-release }}.apk
+          APK_NAME: nethersx2-patch-${{ needs.check-latest-release.outputs.latest-release }}.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -80,7 +80,7 @@ jobs:
   create-release:
     name: Create release
     needs:
-      - check-release
+      - check-latest-release
       - build-apk
     if: ${{ needs.build-apk.result == 'success' }}
     runs-on: ubuntu-24.04
@@ -94,15 +94,15 @@ jobs:
 
       - name: Create release changelog
         run: |
-          ORIGINAL_CHANGELOG="${{ needs.check-release.outputs.latest-release-description }}"
+          ORIGINAL_CHANGELOG="${{ needs.check-latest-release.outputs.latest-release-description }}"
           TRIMMED_CHANGELOG="$(echo "${ORIGINAL_CHANGELOG}" | sed '/^### This release contains the following files:/,$d')"
-          echo -e "# From <${{ needs.check-release.outputs.latest-release-url }}>\n\n${TRIMMED_CHANGELOG}" >> CHANGELOG.txt
+          echo -e "# From <${{ needs.check-latest-release.outputs.latest-release-url }}>\n\n${TRIMMED_CHANGELOG}" >> CHANGELOG.txt
 
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           body_path: CHANGELOG.txt
           files: ${{ needs.build-apk.outputs.apk-name }}
-          tag_name: ${{ needs.check-release.outputs.latest-release }}
+          tag_name: ${{ needs.check-latest-release.outputs.latest-release }}
           fail_on_unmatched_files: true
           make_latest: true

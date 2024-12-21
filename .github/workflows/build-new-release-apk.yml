@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       latest-release: ${{ steps.get-latest-release.outputs.release }}
+      latest-release-description: ${{ steps.get-latest-release.outputs.description }}
       is-new-release: ${{ steps.compare-releases.outputs.is-new }}
     steps:
       - name: Check out this repository
@@ -26,17 +27,11 @@ jobs:
           echo "release=${LAST_KNOWN_RELEASE}" >> "$GITHUB_OUTPUT"
 
       - name: Get latest release from NetherSX2-patch repository
+        id: get-latest-release
         uses: pozetroninc/github-action-get-latest-release@v0.8.0
         with:
           owner: Trixarian
           repo: NetherSX2-patch
-
-      - name: Get latest release from NetherSX2-patch repository
-        id: get-latest-release
-        run: |
-          LATEST_RELEASE_JSON="$(curl -s https://api.github.com/repos/Trixarian/NetherSX2-patch/releases/latest)"
-          LATEST_RELEASE="$(echo "$LATEST_RELEASE_JSON" | jq -r .tag_name)"
-          echo "release=${LATEST_RELEASE}" >> "$GITHUB_OUTPUT"
 
       - name: Compare releases
         id: compare-releases

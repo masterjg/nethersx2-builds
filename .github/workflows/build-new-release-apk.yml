@@ -41,14 +41,23 @@ jobs:
             echo "is-new=1" >> "$GITHUB_OUTPUT"
           fi
 
-  build-release:
+  build-apk:
+    name: Build APK
     needs: check-release
     if: needs.check-release.outputs.is-new-release == '1'
     runs-on: ubuntu-24.04
     steps:
+      - name: Check out NetherSX2-patch repository
+        uses: actions/checkout@v4
+        with:
+          repository: Trixarian/NetherSX2-patch
+          ref: ${{ needs.check-release.outputs.latest-release }}
+          path: NetherSX2-patch
+
       - name: build
         run: |
-          echo ${{ needs.check-release.outputs.latest-release }}
+          ls -la
+          ls -la NetherSX2-patch
 
   # update-release-file:
   #   runs-on: ubuntu-24.04

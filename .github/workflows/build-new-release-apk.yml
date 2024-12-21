@@ -61,13 +61,13 @@ jobs:
 
       - name: Patch AetherSX2 APK
         working-directory: NetherSX2-patch
-        run: |
-          ./patch-apk.sh
-          mv *-patched.apk ../nethersx2-${{ needs.check-release.outputs.latest-release }}.apk
+        run: ./patch-apk.sh
 
-      - name: test
-        run: |
-          ls -la
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nethersx2-${{ needs.check-release.outputs.latest-release }}.apk
+          path: NetherSX2-patch/*-patched.apk
 
   # update-release-file:
   #   runs-on: ubuntu-24.04

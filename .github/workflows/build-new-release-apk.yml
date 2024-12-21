@@ -57,7 +57,7 @@ jobs:
       - name: build
         working-directory: NetherSX2-patch
         run: |
-          ls -la NetherSX2-patch
+          ls -la
 
   # update-release-file:
   #   runs-on: ubuntu-24.04

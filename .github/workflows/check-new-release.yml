@@ -38,6 +38,7 @@ jobs:
           else
             echo "New release found: $LATEST_TAG"
           fi
+          exit 0
       
       - name: Build new NetherSX2 build
         id: build_nethersx2

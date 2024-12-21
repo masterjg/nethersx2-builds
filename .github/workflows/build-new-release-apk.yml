@@ -1,4 +1,4 @@
-name: Check for new NetherSX2-patch release
+name: Build new release APK
 
 on:
   schedule:
@@ -8,51 +8,50 @@ on:
 jobs:
   check-release:
     runs-on: ubuntu-24.04
-    
-    permissions:
-      contents: write
-
     steps:
       - name: Check out this repository
         uses: actions/checkout@v4
 
       - name: Get latest release from NetherSX2-patch repository
-        id: get_latest
         run: |
           LATEST_JSON="$(curl -s https://api.github.com/repos/Trixarian/NetherSX2-patch/releases/latest)"
           LATEST_TAG="$(echo "$LATEST_JSON" | jq -r .tag_name)"
           echo "LATEST_TAG=$LATEST_TAG" >> "$GITHUB_ENV"
 
       - name: Compare with last known release
-        id: compare_releases
         run: |
-          LAST_TAG="none"
+          LAST_TAG=""
           if [ -f .release_version ]; then
             LAST_TAG="$(cat .release_version)"
           fi
           echo "Last known release tag: $LAST_TAG"
           echo "Latest release tag: $LATEST_TAG"
           if [ "$LAST_TAG" = "$LATEST_TAG" ]; then
-            echo "No new release. Exiting..."
-            exit 0
+            echo "IS_NEW=0" >> "$GITHUB_ENV"
           else
-            echo "New release found: $LATEST_TAG"
+            echo "IS_NEW=1" >> "$GITHUB_ENV"
           fi
-          exit 0
-      
-      - name: Build new NetherSX2 build
-        id: build_nethersx2
-        run: |
-          ls -al
 
-      # - name: Update stored release version
-      #   run: |
-      #     # Update .release_version with the new tag
-      #     echo "$LATEST_TAG" > .release_version
-          
-      #     git config user.name "GitHub Actions"
-      #     git config user.email "actions@github.com"
-          
-      #     git add .release_version
-      #     git commit -m "Update last release tag to $LATEST_TAG"
-      #     git push
+  build-release:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: build
+        run: |
+          ls -la
+
+  update-release-file:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Check out this repository
+        uses: actions/checkout@v4
+
+      - name: Update stored release version
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          echo "$LATEST_TAG" > .release_version
+          git add .release_version
+          git commit -m "Update last release tag to $LATEST_TAG"
+          git push

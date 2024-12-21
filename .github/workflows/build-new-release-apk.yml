@@ -15,9 +15,6 @@ jobs:
       latest-release-url: https://github.com/Trixarian/NetherSX2-patch/releases/tag/${{ steps.get-latest-release.outputs.release }}
       is-new-release: ${{ steps.compare-releases.outputs.is-new }}
     steps:
-      - name: Check out this repository
-        uses: actions/checkout@v4
-
       - name: Get last processed release
         id: get-last-processed-release
         uses: pozetroninc/github-action-get-latest-release@v0.8.0

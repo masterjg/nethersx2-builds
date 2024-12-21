@@ -9,6 +9,8 @@ jobs:
   check-release:
     name: Check release
     runs-on: ubuntu-24.04
+    outputs:
+      is_new_release: ${{ steps.compare-releases.outputs.is_new }}
     steps:
       - name: Check out this repository
         uses: actions/checkout@v4
@@ -29,10 +31,14 @@ jobs:
           LATEST_RELEASE="$(echo "$LATEST_RELEASE_JSON" | jq -r .tag_name)"
           echo "release=${LATEST_RELEASE}" >> "$GITHUB_OUTPUT"
 
-      - name: test
+      - name: Compare releases
+        id: compare-releases
         run: |
-          echo ${{ steps.get-last-known-release.outputs.release }}
-          echo ${{ steps.get-latest-release.outputs.release }}
+          if [ "${{ steps.get-last-known-release.outputs.release }}" = "${{ steps.get-latest-release.outputs.release }}" ]; then
+            echo "is_new=0" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_new=1" >> "$GITHUB_OUTPUT"
+          fi
 
       # - name: Compare with last known release
       #   run: |

@@ -19,18 +19,12 @@ jobs:
 
       - name: Get last known release
         id: get-last-known-release
-        uses: satya-500/read-file-github-action@v1
-        with:
-          path: .release_version
-
-      # - name: Get last known release
-      #   id: get-last-known-release
-      #   run: |
-      #     LAST_KNOWN_RELEASE=""
-      #     if [ -f .release_version ]; then
-      #       LAST_KNOWN_RELEASE="$(cat .release_version)"
-      #     fi
-      #     echo "release=${LAST_KNOWN_RELEASE}" >> "$GITHUB_OUTPUT"
+        run: |
+          LAST_KNOWN_RELEASE=""
+          if [ -f .release_version ]; then
+            LAST_KNOWN_RELEASE="$(cat .release_version)"
+          fi
+          echo "release=${LAST_KNOWN_RELEASE}" >> "$GITHUB_OUTPUT"
 
       - name: Get latest release from NetherSX2-patch repository
         id: get-latest-release
@@ -42,7 +36,7 @@ jobs:
       - name: Compare releases
         id: compare-releases
         run: |
-          if [ "${{ steps.get-last-known-release.outputs.contents }}" = "${{ steps.get-latest-release.outputs.release }}" ]; then
+          if [ "${{ steps.get-last-known-release.outputs.release }}" = "${{ steps.get-latest-release.outputs.release }}" ]; then
             echo "is-new=0" >> "$GITHUB_OUTPUT"
           else
             echo "is-new=1" >> "$GITHUB_OUTPUT"
@@ -90,6 +84,7 @@ jobs:
   create-release:
     name: Create release
     needs:
+      - check-release
       - build-apk
     if: ${{ needs.build-apk.result == 'success' }}
     runs-on: ubuntu-24.04
@@ -101,6 +96,8 @@ jobs:
         with:
           name: ${{ needs.build-apk.outputs.apk-name }}
 
+      - run: |
+          echo "${{ needs.check-release.outputs.latest-release-description }}"
       # - name: Create release
       #   uses: softprops/action-gh-release@v2
       #   with:

@@ -12,6 +12,7 @@ jobs:
     outputs:
       latest-release: ${{ steps.get-latest-release.outputs.release }}
       latest-release-description: ${{ steps.get-latest-release.outputs.description }}
+      latest-release-url: https://github.com/Trixarian/NetherSX2-patch/releases/tag/${{ steps.get-latest-release.outputs.release }}
       is-new-release: ${{ steps.compare-releases.outputs.is-new }}
     steps:
       - name: Check out this repository
@@ -97,16 +98,15 @@ jobs:
           name: ${{ needs.build-apk.outputs.apk-name }}
 
       - name: Create release changelog
-        id: create-release-changelog
         run: |
           ORIGINAL_CHANGELOG="${{ needs.check-release.outputs.latest-release-description }}"
           TRIMMED_CHANGELOG="$(echo "${ORIGINAL_CHANGELOG}" | sed '/^### This release contains the following files:/,$d')"
-          echo "changelog=\"${TRIMMED_CHANGELOG}\"" >> "$GITHUB_OUTPUT"
+          echo "From **<${{ needs.check-release.outputs.latest-release-url }}>**:\n\n${TRIMMED_CHANGELOG}" >> CHANGELOG.txt
 
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          body: ${{ steps.create-release-changelog.outputs.changelog }}
+          body_path: CHANGELOG.txt
           preserve_order: true
           files: ${{ needs.build-apk.outputs.apk-name }}
           tag_name: ${{ needs.check-release.outputs.latest-release }}

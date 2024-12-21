@@ -2,7 +2,7 @@ name: Check for new NetherSX2-patch release
 
 on:
   schedule:
-    - cron: 0 3 * * *
+    - cron: "0 3 * * *"
 
 jobs:
   check-release:
